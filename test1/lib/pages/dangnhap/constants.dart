@@ -8,7 +8,6 @@ const BoxDecoration start_bg = BoxDecoration(
     ),
 );
 
-
 // ignore: constant_identifier_names
 const BoxDecoration login_bg =BoxDecoration(
     image: DecorationImage(
@@ -20,4 +19,4 @@ const BoxDecoration login_bg =BoxDecoration(
 
 
 const double defpaultPadding = 16.0;
-const Duration defaultDuration = Duration(milliseconds: 300);
+const Duration defaultDuration = Duration(milliseconds: 400);

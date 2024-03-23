@@ -6,6 +6,7 @@ import 'package:test1/apps/router/routername.dart';
 import '../thongbao/confirm_exit.dart';
 
 class MenuPage extends StatelessWidget {
+
   const MenuPage({super.key});
 
   @override
@@ -37,7 +38,7 @@ class MenuPage extends StatelessWidget {
           ),
           ListTile(
             onTap: () {
-              context.goNamed(RouterName.vegetable);
+              context.goNamed(RouterName.profileadmin);
             },
             leading: const Icon(
               CupertinoIcons.profile_circled,
@@ -65,7 +66,7 @@ class MenuPage extends StatelessWidget {
           ),
           ListTile(
             onTap: () {
-              context.goNamed(RouterName.vegetable);
+              context.goNamed(RouterName.dichbenh);
             },
             leading: const Icon(
               CupertinoIcons.square_favorites,
@@ -80,7 +81,7 @@ class MenuPage extends StatelessWidget {
 
           ListTile(
             onTap: () {
-              context.goNamed(RouterName.home);
+              context.goNamed(RouterName.diadiem);
             },
             leading: const Icon(
               CupertinoIcons.map_fill,
@@ -94,7 +95,7 @@ class MenuPage extends StatelessWidget {
           ),
           ListTile(
             onTap: () {
-              context.goNamed(RouterName.vegetable);
+              context.goNamed(RouterName.thongke);
             },
             leading: const Icon(
               CupertinoIcons.chart_bar_square,

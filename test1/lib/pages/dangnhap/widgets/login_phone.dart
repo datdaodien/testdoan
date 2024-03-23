@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:test1/pages/thongbao/loading.dart';
+import '../../../api/uid.dart';
 import '../../../apps/router/routername.dart';
 import '../../thongbao/connetinternet.dart';
 import '../../thongbao/thongbao.dart';
@@ -23,6 +24,13 @@ class _LoginPhoneState extends State<LoginPhone> {
   User? user;
   String verificationID = "";
   bool isLoading = false;
+
+  void resetScreenState() {
+    setState(() {
+      otpVisibility = false;
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,10 +135,6 @@ class _LoginPhoneState extends State<LoginPhone> {
                           MaterialButton(
                             color: Colors.indigo[900],
                             onPressed: isLoading ? null : () async {
-
-
-
-
                                     FocusScope.of(context).unfocus();
                                     if (otpVisibility) {
                                       verifyOTP();
@@ -165,14 +169,27 @@ class _LoginPhoneState extends State<LoginPhone> {
         .trim(); // Lấy số điện thoại và loại bỏ khoảng trắng
     QuerySnapshot querySnapshot = await storeref
         .where('sdt', isEqualTo: phoneController.text.toString())
+        .where('rool', isEqualTo: 'user')
         .get();
     if (querySnapshot.docs.isEmpty) {
       // Email đã tồn tại trong cơ sở dữ liệu, hiển thị thông báo lỗi và kết thúc quá trình
-      ThongBao().toastMessage('số điện thoại không tồn tại!');
+      ThongBao().toastMessage('Số điện thoại không tồn tại hoặc không có quyền truy cập!');
       setState(() {
         isLoading = false;
       });
       return;
+    }else {
+      var userData = querySnapshot.docs[0].data();
+      if (userData is Map<String, dynamic>) {
+        String? uid = userData['uid'] as String?;
+        String? role = userData['rool'] as String?;
+        if (uid != null) {
+          CurrentUser().uid = uid;
+          UserRole().role = role!;
+          print('UID: $uid');
+          // Tiếp tục xử lý với uid ở đây
+        }
+      }
     }
     if (phoneNumber.isEmpty || phoneNumber.length != 10) {
       setState(() {
@@ -207,11 +224,15 @@ class _LoginPhoneState extends State<LoginPhone> {
       verificationCompleted: (PhoneAuthCredential credential) async {
         await auth.signInWithCredential(credential).then((value) {
           // context.goNamed(RouterName.home);
-          print("Bạn đã đăng nhập thành công");
+          print("Bạn đã đăng nhập thành công vào tài khoản user");
         });
       },
       verificationFailed: (FirebaseAuthException e) {
         print(e.message);
+        ThongBao().toastMessage('Chúng tôi đã chặn tất cả các yêu cầu từ thiết bị này do hoạt động bất thường. Hãy thử lại sau.');
+        setState(() {
+          isLoading = false; // Đặt isLoading là false khi xác thực thành công
+        });
       },
       codeSent: (String verificationId, int? resendToken) {
         otpVisibility = true;
@@ -241,7 +262,7 @@ class _LoginPhoneState extends State<LoginPhone> {
         if (user != null) {
           await Future.delayed(const Duration(seconds: 1));
           Fluttertoast.showToast(
-            msg: "Bạn đã đăng nhập thành công",
+            msg: "Bạn đã đăng nhập thành công vào tài khoản user ",
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 1,
@@ -252,7 +273,7 @@ class _LoginPhoneState extends State<LoginPhone> {
           setState(() {
             isLoading = false;
           });
-          context.goNamed(RouterName.home);
+          context.goNamed(RouterName.home2);
         } else {
           await Future.delayed(const Duration(seconds: 1));
           Fluttertoast.showToast(
@@ -267,6 +288,7 @@ class _LoginPhoneState extends State<LoginPhone> {
           setState(() {
             isLoading = false;
           });
+          resetScreenState();
           context.goNamed(RouterName.loginphone);
         }
       },

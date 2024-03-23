@@ -421,6 +421,7 @@ class _AddDiaDiemState extends State<AddDiaDiem> {
                         ),
                         child: Text('Hủy'), // Text nút hủy
                       ),
+
                     ),
                     SizedBox(width: 16), // Khoảng cách giữa hai nút
                     Expanded(

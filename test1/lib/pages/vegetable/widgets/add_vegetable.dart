@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,7 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:test1/apps/router/routername.dart';
 import '../../thongbao/loading.dart';
 import '../../thongbao/thongbao.dart';
-
+import 'package:http/http.dart' as http;
 import 'package:fast_contacts/fast_contacts.dart';
 
 class AddVegetable extends StatefulWidget {
@@ -43,6 +45,89 @@ class _AddVegetableState extends State<AddVegetable> {
       FirebaseFirestore.instance.collection('vegetable');
   DateTime now = DateTime.now();
 
+  Future<List<String>> getAllTokens() async {
+    DatabaseReference tokensRef =
+    FirebaseDatabase.instance.ref('device_tokens');
+    List<String> allTokens = [];
+
+    try {
+      DatabaseEvent event =
+      await tokensRef.once(); // Sử dụng Event thay vì DataSnapshot
+      Map<dynamic, dynamic>? tokensData =
+      event.snapshot.value as Map<dynamic, dynamic>?;
+      if (tokensData != null) {
+        tokensData.forEach((key, value) {
+          if (value['token'] != null) {
+            allTokens.add(value['token']);
+          }
+        });
+      }
+    } catch (e) {
+      print('Lỗi khi lấy danh sách token: $e');
+    }
+    return allTokens;
+  }
+
+  Future<void> sendPushMessages(List<String> allTokens) async {
+    if (allTokens.isEmpty) {
+      print('Không có token nào để gửi thông báo.');
+      return;
+    }
+    for (String token in allTokens) {
+      try {
+        await http.post(
+          Uri.parse('https://fcm.googleapis.com/fcm/send'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Authorization':
+            'key=AAAAZ7vh0zo:APA91bGmCzDCTR2rBGKIFETTRe5ep11AJJPwVUT_qZPX8Un0cd-XbZUsMq2yGVTlYT8vqVo1TfTNakTbHXLgX79mtSYfGm_lGhWdIeJx67T-2dUxZyR8t9a5iep96sUw0iarx8uBoFsQ',
+            // Thay thế bằng khóa máy chủ của bạn
+          },
+          body: constructFCMPayload(token),
+        );
+        print('Yêu cầu FCM cho thiết bị được gửi!');
+      } catch (e) {
+        print(e);
+      }
+    }
+  }
+
+  int _messageCount = 0;
+
+  // Xây dựng tải trọng FCM cho mục đích trình diễn.
+  String constructFCMPayload(String token) {
+    _messageCount++;
+    String title = 'Thông Báo Thêm Loại Cây Trồng Mới';
+    String body = "Cây trồng mới là ${tenvegetableController.text}";
+    return jsonEncode({
+      'to': token,
+      'data': {
+        'via': 'FlutterFire Nhắn tin trên đám mây!!!',
+        'count': _messageCount.toString(),
+      },
+      'notification': {
+        'title': title,
+        'body': body,
+      },
+    });
+  }
+  final DatabaseReference _database =
+  FirebaseDatabase.instance.ref('notifications');
+
+  void _sendNotification() {
+    String title = 'Thông Báo Thêm Loại Cây Trồng Mới';
+    String body = "Cây trồng mới là ${tenvegetableController.text}";
+
+    // Lưu dữ liệu vào Realtime Database
+    _database.push().set({
+      'title': title,
+      'body': body,
+      'scheduletime': DateTime.now().toString(),
+      'timestamp': DateTime.now().toString(),
+    });
+  }
+
+
   void Firestore(vid, newUrl) async {
     setState(() {
       isLoading = true;
@@ -60,6 +145,15 @@ class _AddVegetableState extends State<AddVegetable> {
       setState(() {
         isLoading = false;
       });
+      List<String> allTokens = await getAllTokens();
+      if (allTokens.isNotEmpty) {
+        await sendPushMessages(allTokens);
+        print('Đã gửi thông báo cay trong');
+      } else {
+        print('Không có mã thông báo nào có sẵn để gửi thông báo.');
+      }
+      _sendNotification();
+
       ThongBao().toastMessage('thêm giống cây trồng thành công!');
       context.goNamed(RouterName.vegetable);
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:test1/apps/router/routername.dart';
 
@@ -13,7 +12,7 @@ Future<bool> ConfirmExit(BuildContext context) async {
         TextButton(
           onPressed: () {
             context.goNamed(RouterName.auth);
-            SystemNavigator.pop();
+            // SystemNavigator.pop();
           },
           child: Text('Đồng ý'),
         ),

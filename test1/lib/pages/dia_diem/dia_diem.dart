@@ -5,14 +5,12 @@ import 'package:test1/pages/dia_diem/widgets/dia_diem_search.dart';
 import '../../apps/router/routername.dart';
 import '../thongbao/connetinternet.dart';
 
-
 class DiaDiemPage extends StatefulWidget {
   const DiaDiemPage({super.key});
 
   @override
   State<DiaDiemPage> createState() => _DiaDiemPageState();
 }
-
 class _DiaDiemPageState extends State<DiaDiemPage> {
   final TextEditingController textEditingController = TextEditingController();
 
@@ -27,6 +25,7 @@ class _DiaDiemPageState extends State<DiaDiemPage> {
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Column(
             children: [
+              const SizedBox(height: 15),
               DiaDiemSearch(textEditingController: textEditingController,
                 onSearchTextChanged: (value) {
                   setState(() {
@@ -34,7 +33,7 @@ class _DiaDiemPageState extends State<DiaDiemPage> {
                         value; // Cập nhật giá trị tìm kiếm khi có sự thay đổi
                   });
                 },),
-              const SizedBox(height: 20),
+
               Expanded(
                 child: DiaDiemList(keySearch: textEditingController.text),
               ),

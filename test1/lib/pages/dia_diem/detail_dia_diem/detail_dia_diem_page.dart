@@ -3,10 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:test1/pages/dia_diem/detail_dia_diem/detail_dia_dien_vetetable_page.dart';
 import 'package:test1/pages/thongbao/thongbao.dart';
 import 'package:transparent_image/transparent_image.dart';
 
@@ -27,7 +27,6 @@ class _DetailDiaDiemPageState extends State<DetailDiaDiemPage> {
   CollectionReference _storeref =
       FirebaseFirestore.instance.collection('users');
 
-  final _auth = FirebaseAuth.instance;
 
   File? _imageFile;
   bool isLoading = false;
@@ -43,7 +42,6 @@ class _DetailDiaDiemPageState extends State<DetailDiaDiemPage> {
   }
 
   void updata(BuildContext context) async {
-
     TextEditingController nameController =
         TextEditingController(text: widget.item['name']);
     TextEditingController tuoiController =
@@ -141,7 +139,8 @@ class _DetailDiaDiemPageState extends State<DetailDiaDiemPage> {
                   TextField(
                     controller: tuoiController,
                     keyboardType: TextInputType.datetime,
-                    decoration: InputDecoration(labelText: 'Tuổi',
+                    decoration: InputDecoration(
+                      labelText: 'Tuổi',
                       suffixIcon: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: InkWell(
@@ -154,7 +153,7 @@ class _DetailDiaDiemPageState extends State<DetailDiaDiemPage> {
                             );
                             if (selectedDate != null) {
                               final formattedDate =
-                              DateFormat('dd/MM/yyyy').format(selectedDate);
+                                  DateFormat('dd/MM/yyyy').format(selectedDate);
                               tuoiController.text = formattedDate;
                             }
                           },
@@ -172,11 +171,14 @@ class _DetailDiaDiemPageState extends State<DetailDiaDiemPage> {
                     keyboardType: TextInputType.number,
                     maxLength: 10,
                     inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly, // Chỉ cho phép nhập số
-                      LengthLimitingTextInputFormatter(10), // Giới hạn tối đa 10 ký tự
+                      FilteringTextInputFormatter.digitsOnly,
+                      // Chỉ cho phép nhập số
+                      LengthLimitingTextInputFormatter(10),
+                      // Giới hạn tối đa 10 ký tự
                     ],
                     controller: sdtController,
-                    decoration: const InputDecoration(labelText: 'Số điện thoại'),
+                    decoration:
+                        const InputDecoration(labelText: 'Số điện thoại'),
                   ),
                   TextField(
                     maxLines: 1,
@@ -221,7 +223,6 @@ class _DetailDiaDiemPageState extends State<DetailDiaDiemPage> {
                             'diachi': newDiachi,
                             'sdt': newSdt,
                             'hinh': newUrl, // Lưu URL mới vào Firestore
-
                           });
                         } else {
                           // Trường hợp không có hình mới, chỉ cập nhật thông tin người dùng
@@ -241,7 +242,9 @@ class _DetailDiaDiemPageState extends State<DetailDiaDiemPage> {
                         });
                         Navigator.of(context).pop();
                       },
-                child: isLoading ? const CircularProgressIndicator() : const Text('Lưu'),
+                child: isLoading
+                    ? const CircularProgressIndicator()
+                    : const Text('Lưu'),
               ),
             ],
           );
@@ -369,9 +372,7 @@ class _DetailDiaDiemPageState extends State<DetailDiaDiemPage> {
                           style: TextStyle(color: Colors.grey[500]),
                         ),
                         IconButton(
-                            onPressed: () {
-
-                            },
+                            onPressed: () {},
                             icon: Icon(Icons.settings, color: Colors.grey[400]))
                       ],
                     ),
@@ -425,7 +426,8 @@ class _DetailDiaDiemPageState extends State<DetailDiaDiemPage> {
                             icon: Icon(Icons.settings, color: Colors.grey[400]))
                       ],
                     ),
-                    Text(calculateAge(widget.item['tuoi']).toString())//hàm tính tuổi
+                    Text(calculateAge(widget.item['tuoi']).toString())
+                    //hàm tính tuổi
                   ],
                 ),
               ),
@@ -475,33 +477,82 @@ class _DetailDiaDiemPageState extends State<DetailDiaDiemPage> {
                             icon: Icon(Icons.settings, color: Colors.grey[400]))
                       ],
                     ),
-                    Text(widget.item['diachi'] ?? 'Chưa cập nhật')
+                    Text(widget.item["diachi"] ?? 'Chưa cập nhật')
                   ],
                 ),
               ),
-              Container(
-                decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(8)),
-                padding: const EdgeInsets.only(left: 15, bottom: 15),
-                margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              GestureDetector(
+                onTap: () {
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(builder: (context) => DetailDiaDiemVegetable(item:(){})),
+                  // );
+                   //context.goNamed(RouterName.detaildiadiemvegetable);
+                },
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => DetailDiaDiemVegetable(item: widget.item,)),
+                    );
+                  },
+
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.only(left: 15, bottom: 15),
+                    margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          "Cây trồng: ",
-                          style: TextStyle(color: Colors.grey[500]),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Cây trồng: ",
+                              style: TextStyle(color: Colors.grey[500]),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                showCustomDialog(context);
+                              },
+                              icon: Icon(Icons.settings, color: Colors.grey[400]),
+                            ),
+                          ],
                         ),
-                        IconButton(
-                            onPressed: () {},
-                            icon: Icon(Icons.settings, color: Colors.grey[400]))
+                        FutureBuilder<QuerySnapshot>(
+                          future: FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(widget.item['uid'])
+                              .collection('vegetable')
+                              .get(),
+                          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              return Text('Error: ${snapshot.error}');
+                            } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                              return Text('Không có cây trồng nào');
+                            } else {
+                              return ListView(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                                  Map<String, dynamic> data =
+                                  document.data() as Map<String, dynamic>;
+                                  String vegetableName ="+ ${data['tenvegetable']}.";
+                                  return Text(vegetableName);
+                                }).toList(),
+                              );
+                            }
+                          },
+                        ),
                       ],
                     ),
-                    Text(widget.item['uid'] ?? 'Chưa cập nhật')
-                  ],
+
+                  ),
                 ),
               )
             ],
@@ -509,5 +560,108 @@ class _DetailDiaDiemPageState extends State<DetailDiaDiemPage> {
         },
       ),
     );
+  }
+
+  void showCustomDialog(BuildContext context) {
+    Set<String> selectedVegetables = {}; // Set để lưu các cây trồng đã chọn
+    List<bool> isSelectedList = [];
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return FutureBuilder<QuerySnapshot>(
+          future: FirebaseFirestore.instance.collection('vegetable').get(),
+          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            }
+            isSelectedList = List<bool>.filled(snapshot.data!.docs.length, false);
+
+            return AlertDialog(
+              title: Text('Thêm cây trồng.'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: snapshot.hasData
+                    ? snapshot.data!.docs.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  DocumentSnapshot document = entry.value;
+                  Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+                  String vegetableID = document.id;
+                  String vegetableName = data['tenvegetable'];
+                  return ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        isSelectedList[index] = !isSelectedList[index];
+                        if (isSelectedList[index]) {
+                          selectedVegetables.add(vegetableID);
+                          selectedVegetables.add(vegetableName);
+                        } else {
+                          selectedVegetables.remove(vegetableID);
+                          selectedVegetables.remove(vegetableName);
+                        }
+                      });
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                            (Set<MaterialState> states) {
+                          return isSelectedList[index] ? Colors.green : Colors.grey;
+                        },
+                      ),
+                    ),
+                    child: Text(
+                      vegetableName,
+                      style: TextStyle(
+                        color: isSelectedList[index] ? Colors.white : Colors.black,
+                      ),
+                    ),
+                  );
+                }).toList()
+                    : [],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Đóng dialog khi nhấn nút Hủy
+                  },
+                  child: Text('Hủy'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    // Xử lý lưu dữ liệu khi nhấn nút Lưu
+                    saveSelectedVegetables(selectedVegetables.toList());
+                    Navigator.of(context).pop(); // Đóng dialog
+                  },
+                  child: Text('Lưu'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+
+  Future<void> saveSelectedVegetables(List<String> selectedVegetables) async {
+    final userDocRef = FirebaseFirestore.instance.collection('users').doc(
+        widget.item['uid']);
+    final vegetableRef = userDocRef.collection('vegetable');
+
+    for (String vegetableID in selectedVegetables) {
+      // Fetch the details of the selected vegetable
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection(
+          'vegetable').doc(vegetableID).get();
+      if (snapshot.exists) {
+        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+        String vegetableName = data['tenvegetable'];
+
+        // For each selected vegetable, store its ID and name under the 'vegetable' collection
+        await vegetableRef.doc(vegetableID).set({
+          'vid': vegetableID,
+          'tenvegetable': vegetableName,
+          // Other details if needed
+        });
+      }
+    }
   }
 }

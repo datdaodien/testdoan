@@ -3,7 +3,7 @@ import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 
 import 'package:test1/pages/menu/menu_page.dart';
 
-// ignore: must_be_immutable menu
+// ignore: must_be_immutable menu, must_be_immutable
 class RootPage extends StatefulWidget {
   Widget child;
 

@@ -34,8 +34,8 @@ class _HomeListState extends State<HomeList> {
             String routeName = '';
             // Xác định routeName dựa trên giá trị title của item
             switch (item.title) {
-              case 'Thông tin cá nhân':
-                routeName = RouterName.profile;
+              case 'Thông tin liên hệ':
+                routeName = RouterName.profileadmin;
                 break;
               case 'Rau củ':
                 routeName = RouterName.vegetable;
@@ -43,16 +43,17 @@ class _HomeListState extends State<HomeList> {
               case 'Địa Điểm':
                 routeName = RouterName.diadiem;
                 break;
-
               case 'Dịch Bệnh':
                 routeName = RouterName.dichbenh;
                 break;
+              case 'Thống Kê':
+                routeName = RouterName.thongke;
+                break;
               case 'Thông Báo':
                 routeName = RouterName.thongbao;
+                //routeName = RouterName.thongbao;
                 break;
-              case 'Thống Kê':
 
-                break;
               case 'Cài Đặt':
 
                 break;

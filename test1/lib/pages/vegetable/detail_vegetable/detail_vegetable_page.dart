@@ -7,8 +7,6 @@ class DetailVegetablePage extends StatelessWidget {
 
   DetailVegetablePage({super.key, required this.item});
 
-
-
   @override
   Widget build(BuildContext context) {
 
@@ -16,130 +14,136 @@ class DetailVegetablePage extends StatelessWidget {
     List<String> uudiem = item['uudiem'].toString().split(', ');
     List<String> nhuocdiem = item['nhuocdiem'].toString().split(', ');
 
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: <Widget>[
-          SliverPersistentHeader(
-            delegate: MySliverPersistentHeaderDelegate(item: item),
-            pinned: true,
-          ),
-          SliverList(
-            delegate: SliverChildListDelegate(
-              [
-                SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20.0,
-                      vertical: 20,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Tên Giống cây trồng:',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          '   ${item['tenvegetable']}',
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          'Xuất xứ:',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          ' + ${item['xuatxu']}',
-                          // Xuất xứ
-                        ),
+    return WillPopScope(
+      onWillPop: () async {
+        return true;
+      },
+      child: Scaffold(
 
-                        const SizedBox(height: 20),
-                        const Text(
-                          'Thời gian sinh trưởng và phát triển:',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
+        body: CustomScrollView(
+          slivers: <Widget>[
+            SliverPersistentHeader(
+              delegate: MySliverPersistentHeaderDelegate(item: item),
+              pinned: true,
+            ),
+            SliverList(
+              delegate: SliverChildListDelegate(
+                [
+                  SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20.0,
+                        vertical: 20,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Tên Giống cây trồng:',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          ' + ${item['sinhtruong']}',
-                          // Sinh trưởng
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          'Điều kiện sinh trưởng và phát triển:',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
+                          const SizedBox(height: 5),
+                          Text(
+                            '   ${item['tenvegetable']}',
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 5),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: dieukien.map((condition) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 5,left: 8),
-                              child: Text('+ $condition.'),
-                            );
-                          }).toList(),
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          'Ưu điểm:',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
+                          const SizedBox(height: 20),
+                          const Text(
+                            'Xuất xứ:',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 5),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: uudiem.map((condition) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 5,left: 8),
-                              child: Text('+ $condition.'),
-                            );
-                          }).toList(),
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          'Nhược điểm:',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
+                          const SizedBox(height: 5),
+                          Text(
+                            ' + ${item['xuatxu']}',
+                            // Xuất xứ
                           ),
-                        ),
-                        const SizedBox(height: 5),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: nhuocdiem.map((condition) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 5,left: 8),
-                              child: Text('+ $condition.'),
-                            );
-                          }).toList(),
-                        ),
 
-                      ],
+                          const SizedBox(height: 20),
+                          const Text(
+                            'Thời gian sinh trưởng và phát triển:',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            ' + ${item['sinhtruong']}',
+                            // Sinh trưởng
+                          ),
+                          const SizedBox(height: 20),
+                          const Text(
+                            'Điều kiện sinh trưởng và phát triển:',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: dieukien.map((condition) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 5,left: 8),
+                                child: Text('+ $condition.'),
+                              );
+                            }).toList(),
+                          ),
+                          const SizedBox(height: 20),
+                          const Text(
+                            'Ưu điểm:',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: uudiem.map((condition) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 5,left: 8),
+                                child: Text('+ $condition.'),
+                              );
+                            }).toList(),
+                          ),
+                          const SizedBox(height: 20),
+                          const Text(
+                            'Nhược điểm:',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: nhuocdiem.map((condition) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 5,left: 8),
+                                child: Text('+ $condition.'),
+                              );
+                            }).toList(),
+                          ),
+
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -177,7 +181,7 @@ class MySliverPersistentHeaderDelegate extends SliverPersistentHeaderDelegate {
       child: FadeInImage.memoryNetwork(
         fit: BoxFit.cover,
         placeholder: kTransparentImage,
-        image: item['hinhvegetable'], // 'https://images.unsplash.com/photo-1490772888775-55fceea286b8?auto=format&fit=crop&q=80&w=1740&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+        image: item['hinhvegetable'] is String ? item['hinhvegetable'] : '', // 'https://images.unsplash.com/photo-1490772888775-55fceea286b8?auto=format&fit=crop&q=80&w=1740&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
       ),
     );
   }

@@ -12,10 +12,11 @@ class DetailDichBenhPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    List<String> dieukien = item['dieukien'].toString().split(', ');
-    List<String> uudiem = item['uudiem'].toString().split(', ');
-    List<String> nhuocdiem = item['nhuocdiem'].toString().split(', ');
 
+    List<String> bieuhien = item['bieuhien'].toString().split(', ');
+    List<String> cachdieutri = item['cachdieutri'].toString().split(', ');
+    List<dynamic> thuongXuatHienList = item['thuongxuathien'];
+    print(item['thuongxuathien']);
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
@@ -36,7 +37,7 @@ class DetailDichBenhPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Tên Giống cây trồng:',
+                          'Tên dich bênh:',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
@@ -52,7 +53,7 @@ class DetailDichBenhPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 20),
                         const Text(
-                          'Xuất xứ:',
+                          'Thuộc loại:',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
@@ -60,26 +61,13 @@ class DetailDichBenhPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          ' + ${item['xuatxu']}',
+                          ' + ${item['loaidichbenh']}',
                           // Xuất xứ
                         ),
 
                         const SizedBox(height: 20),
                         const Text(
-                          'Thời gian sinh trưởng và phát triển:',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          ' + ${item['sinhtruong']}',
-                          // Sinh trưởng
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          'Điều kiện sinh trưởng và phát triển:',
+                          'Thường xuất hiện ở các loại cây:',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
@@ -88,7 +76,25 @@ class DetailDichBenhPage extends StatelessWidget {
                         const SizedBox(height: 5),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: dieukien.map((condition) {
+                          children: thuongXuatHienList.map((item) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 5, left: 8),
+                              child: Text('+ $item'),
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 20),
+                        const Text(
+                          'Biểu hiện đặt tính:',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: bieuhien.map((condition) {
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 5,left: 8),
                               child: Text('+ $condition.'),
@@ -97,7 +103,7 @@ class DetailDichBenhPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 20),
                         const Text(
-                          'Ưu điểm:',
+                          'cách điều trị:',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
@@ -106,25 +112,7 @@ class DetailDichBenhPage extends StatelessWidget {
                         const SizedBox(height: 5),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: uudiem.map((condition) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 5,left: 8),
-                              child: Text('+ $condition.'),
-                            );
-                          }).toList(),
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          'Nhược điểm:',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: nhuocdiem.map((condition) {
+                          children: cachdieutri.map((condition) {
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 5,left: 8),
                               child: Text('+ $condition.'),

@@ -7,16 +7,18 @@ import '../thongbao/confirm_exit.dart';
 import '../thongbao/connetinternet.dart';
 
 class HomePage extends StatefulWidget {
-   const HomePage({Key? key,});
+  HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+
   @override
   Widget build(BuildContext context) {
     ConnecInternet.checkInternetConnection();
+
     return WillPopScope(
       onWillPop: () async => await ConfirmExit(context),
       child: Scaffold(
@@ -29,7 +31,7 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(height: 20),
                 HomeSearch(),
                 SizedBox(height: 20),
-                Expanded(child:HomeList())
+                Expanded(child:HomeList()),
               ],
             ),
           ),

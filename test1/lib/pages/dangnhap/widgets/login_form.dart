@@ -28,7 +28,7 @@ class _LoginFormState extends State<LoginForm> {
     try {
       List<String> signInMethods = await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
 
-      if (signInMethods != null && signInMethods.isNotEmpty) {
+      if (signInMethods.isNotEmpty) {
         // Email tồn tại trong hệ thống
         return true;
         // Thực hiện các hành động tiếp theo ở đây

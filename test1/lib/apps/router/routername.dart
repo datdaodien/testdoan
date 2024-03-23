@@ -13,28 +13,35 @@ class RouterName{
 
     static const String thongke = 'thongke';
 
+    static const String thongbao = 'thongbao';
+
     static const String dichbenh = 'dichbenh';
       static const String detaildichbenh = 'detaildichbenh';
       static const String adddichbenh = 'adddichbenh';
 
-    static const String profile= 'profile';
+  static const String profileadmin= 'profileadmin';
 
     static const String diadiem = 'diadiem';
      static const String detaildiadiem = 'detaildiadiem';
+     static const String detaildiadiemvegetable = 'detaildiadiemvegetable';
      static const String adddiadiem = 'adddiadiem';
+//goc home2 của user
+  static const String home2 = 'home2';
+  static const String profile2 = 'profile2';
 
-//menu
-  static const String vegetablemenu = 'vegetablemenu';
-    static const String detailvegetablemenu = 'detailvegetablemenu';
+  static const String vegetable2 = 'vegetable2';
+  static const String detailvegetable2 = 'detailvegetable2';
+  static const String addvegetable2 = 'addvegetable2';
 
-  static const String thongbao = 'thongbao';
+  static const String dichbenh2 = 'dichbenh2';
+  static const String detaildichbenh2 = 'detaildichbenh2';
+  static const String adddichbenh2 = 'adddichbenh2';
+  //
+  static const String profileadmin2= 'profileadmin2';
+  //
 
-  static const String dichbenhmenu = 'dichbenhmenu';
-    static const String detaildichbenhmenu = 'detaildichbenhmenu';
-  static const String thongkemennu = 'thongkemennu';
 
-  static const String profilemenu = 'profilemenu';
 
-  static const String diadiemmenu = 'diadiemmenu';
+
 
 }

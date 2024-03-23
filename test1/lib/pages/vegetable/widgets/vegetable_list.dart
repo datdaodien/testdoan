@@ -5,11 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:transparent_image/transparent_image.dart';
+import '../../../api/uid.dart';
 import '../../../apps/router/routername.dart';
 import '../../thongbao/thongbao.dart';
 
+
 class VegetableList extends StatefulWidget {
-   VegetableList({Key? key});
+  final String keySearch;
+   VegetableList({super.key, required this.keySearch});
 
   @override
   State<VegetableList> createState() => _VegetableListState();
@@ -18,12 +21,10 @@ class VegetableList extends StatefulWidget {
 class _VegetableListState extends State<VegetableList> {
   final Storageref = FirebaseStorage.instance.ref().child("hinhvegetable");
 
-  final fireStore = FirebaseFirestore.instance.collection('vegetable').snapshots();
+  final fireStore = FirebaseFirestore.instance.collection('vegetable').orderBy('vid', descending: false).snapshots();
 
    File? _imageFile;
-
    bool isLoading = false;
-
    ImagePicker picker = ImagePicker();
 
    Future<void> _getImage(ImageSource source) async {
@@ -34,9 +35,13 @@ class _VegetableListState extends State<VegetableList> {
        });
      }
    }
+  String userRole = UserRole().role;
+
 
   @override
   Widget build(BuildContext context) {
+    ModalRoute<Object?>? route = ModalRoute.of(context);//kiểm tra luồn di chuyển.
+    bool isAdmin = userRole == 'admin';
     return StreamBuilder<QuerySnapshot>(
       stream: fireStore,
       builder: (context, snapshot) {
@@ -46,156 +51,179 @@ class _VegetableListState extends State<VegetableList> {
         if (snapshot.hasError) {
           ThongBao().toastMessage('Đã xảy ra một số lỗi!');
         }
-
-        return ListView.separated(
-          separatorBuilder: (context, index) => const SizedBox(height: 20),
+        print(snapshot.data!.docs.length);
+        return ListView.builder(
           itemCount: snapshot.data!.docs.length,
+
           itemBuilder: (BuildContext context, int index) {
-            return InkWell(
-              onTap: () {
-                context.goNamed(RouterName.detailvegetable, extra: snapshot.data!.docs[index].data());
-              },
-              onLongPress: () {
-                showModalBottomSheet(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Wrap(
-                      children: <Widget>[
-                        ListTile(
-                          leading: const Icon(Icons.edit),
-                          title: const Text('Cập nhật'),
-                          onTap: () {
-                            Navigator.pop(context);
-                            _showMyDialog(context,snapshot.data!.docs[index]);
+            var name = snapshot.data!.docs[index]['tenvegetable'].toString().toUpperCase();
+            var origin = snapshot.data!.docs[index]['xuatxu'].toString().toUpperCase();
+            var conditions = snapshot.data!.docs[index]['dieukien'].toString().toUpperCase();
+            var searchKey = widget.keySearch.toUpperCase();
+            print(widget.keySearch);
+              // Kiểm tra nếu bất kỳ trường nào chứa giá trị tìm kiếm
+            bool isNameContains = name.contains(searchKey);
+            bool isoriginContains = origin.contains(searchKey);
+            bool isconditionsContains = conditions.contains(searchKey);
+            // bool isRoolContains = rool.contains("user");
+            if (isNameContains || isoriginContains || isconditionsContains){
 
-                          },
-                        ),
-                        ListTile(
-                          leading: const Icon(Icons.delete),
-                          title: const Text('Xóa'),
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: Text('Xác nhận xóa'),
-                                  content: Text('Bạn có chắc chắn muốn xóa tài liệu này không?'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text('Hủy'),
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () async {
-                                        await Storageref.child("/${snapshot.data!.docs[index]['tenvegetable']}.jpg").delete();
+            return Column(
+              children: [
+                InkWell(
+                  onTap: () {
+                    if (route?.settings.name == RouterName.vegetable2) {
+                      context.goNamed(RouterName.detailvegetable2, extra: snapshot.data!.docs[index].data());
+                    } else {
+                      context.goNamed(RouterName.detailvegetable, extra: snapshot.data!.docs[index].data());
+                    }
+                  },
+                  onLongPress:isAdmin? () {
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Wrap(
+                          children: <Widget>[
+                            ListTile(
+                              leading: const Icon(Icons.edit),
+                              title: const Text('Cập nhật'),
+                              onTap: () {
+                                Navigator.pop(context);
+                                _showMyDialog(context,snapshot.data!.docs[index]);
+                              },
+                            ),
+                            ListTile(
+                              leading: const Icon(Icons.delete),
+                              title: const Text('Xóa'),
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: const Text('Xác nhận xóa'),
+                                      content: Text('Bạn có chắc chắn muốn xóa ${snapshot.data!.docs[index]['tenvegetable']} này không?'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: const Text('Hủy'),
+                                        ),
+                                        ElevatedButton(
+                                          onPressed: () async {
+                                            await Storageref.child("/${snapshot.data!.docs[index]['tenvegetable']}.jpg").delete();
 
-                                        await snapshot.data!.docs[index].reference.delete().then((value) {
-                                          ThongBao().toastMessage('Đã xóa thành công!');
-                                        }).onError((error, stackTrace) {
-                                          ThongBao().toastMessage('Đã xảy ra lỗi!');
-                                        });
-                                        Navigator.of(context).pop(); // Đóng dialog sau khi xóa
-                                      },
-                                      child: Text('Xóa'),
-                                    ),
-                                  ],
+                                            await snapshot.data!.docs[index].reference.delete().then((value) {
+                                              ThongBao().toastMessage('Đã xóa thành công!');
+                                            }).onError((error, stackTrace) {
+                                              ThongBao().toastMessage('Đã xảy ra lỗi!');
+                                            });
+                                            Navigator.of(context).pop(); // Đóng dialog sau khi xóa
+                                          },
+                                          child: const Text('Xóa'),
+                                        ),
+                                      ],
+                                    );
+                                  },
                                 );
                               },
-                            );
-                          },
-                        ),
-                      ],
+                            ),
+                          ],
+                        );
+                      },
                     );
-                  },
-                );
-              },
-              child: AspectRatio(
-              aspectRatio: 5/2,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey,
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          child: AspectRatio(
-                            aspectRatio: 1,
-                            child: ClipRRect(
-                              clipBehavior: Clip.hardEdge,
-                              borderRadius: BorderRadius.circular(10.0),
-                              child: FadeInImage.memoryNetwork(
-                                placeholder: kTransparentImage,
-                                fit: BoxFit.cover,
-                                image:(snapshot.data!.docs[index]['hinhvegetable']),
+                  }:null,
+                  child: AspectRatio(
+                  aspectRatio: 5/2,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey,
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              child: AspectRatio(
+                                aspectRatio: 1,
+                                child: ClipRRect(
+                                  clipBehavior: Clip.hardEdge,
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  child: FadeInImage.memoryNetwork(
+                                    placeholder: kTransparentImage,
+                                    fit: BoxFit.cover,
+                                    image:(snapshot.data!.docs[index]['hinhvegetable']),
 
+                                  ),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              snapshot.data!.docs[index]['tenvegetable'],
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Colors.black, // Màu văn bản
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-                            Row(
-                              children: [
-                                Text('Xuất xứ: '),
-                                Text(
-                                  snapshot.data!.docs[index]['xuatxu'],
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 5),
-                            Column(
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Điều kiện phát triền: ',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.black.withOpacity(0.5), // Màu chữ của văn bản con với độ mờ
+                                  snapshot.data!.docs[index]['tenvegetable'],
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: Colors.black, // Màu văn bản
                                   ),
                                 ),
-                                SizedBox(height: 5),
-                                Text(
-                                  '+ ' + snapshot.data!.docs[index]['dieukien'],
+                                const SizedBox(height: 5),
+                                Row(
+                                  children: [
+                                    const Text('Xuất xứ: '),
+                                    Text(
+                                      snapshot.data!.docs[index]['xuatxu'],
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 5),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Điều kiện phát triền: ',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.black.withOpacity(0.5), // Màu chữ của văn bản con với độ mờ
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    Text(
+                                      '+ ' + snapshot.data!.docs[index]['dieukien'],
 
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 14,
-                                  ),
-                                  maxLines: 1, // Giới hạn số dòng là 1
-                                  overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                      ),
+                                      maxLines: 1, // Giới hạn số dòng là 1
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
+                const SizedBox(height: 10),
+              ],
             );
+            } else {
+              return const SizedBox(height: 10); // Trả về widget trống nếu không tìm thấy kết quả
+            }
           },
         );
       }
@@ -217,7 +245,7 @@ class _VegetableListState extends State<VegetableList> {
          return StatefulBuilder(
            builder: (BuildContext context, StateSetter setState) {
              return AlertDialog(
-               title: Text('Cập Nhật Thông Tin'),
+               title: const Text('Cập Nhật Thông Tin'),
                content: SingleChildScrollView(
                  child: Column(
                    mainAxisSize: MainAxisSize.min,
@@ -288,12 +316,12 @@ class _VegetableListState extends State<VegetableList> {
                              bottom: 0,
                              right: 0,
                              child: Container(
-                               padding: EdgeInsets.all(4),
-                               decoration: BoxDecoration(
+                               padding: const EdgeInsets.all(4),
+                               decoration: const BoxDecoration(
                                  color: Colors.white,
                                  shape: BoxShape.circle,
                                ),
-                               child: Icon(Icons.camera_alt),
+                               child: const Icon(Icons.camera_alt),
                              ),
                            ),
                          ],
@@ -301,27 +329,27 @@ class _VegetableListState extends State<VegetableList> {
                      ),
                      TextField(
                        controller: nameController,
-                       decoration: InputDecoration(labelText: 'Tên'),
+                       decoration: const InputDecoration(labelText: 'Tên'),
                      ),
                      TextField(
                        controller: xuatxuController,
-                       decoration: InputDecoration(labelText: 'Xuất xứ'),
+                       decoration: const InputDecoration(labelText: 'Xuất xứ'),
                      ),
                      TextField(
                        controller: sinhtruongController,
-                       decoration: InputDecoration(labelText: 'Thời gian sinh trưởng'),
+                       decoration: const InputDecoration(labelText: 'Thời gian sinh trưởng'),
                      ),
                      TextField(
                        controller: uudiemController,
-                       decoration: InputDecoration(labelText: 'Ưu điểm'),
+                       decoration: const InputDecoration(labelText: 'Ưu điểm'),
                      ),
                      TextField(
                        controller: nhuocdiemController,
-                       decoration: InputDecoration(labelText: 'Nhược điểm'),
+                       decoration: const InputDecoration(labelText: 'Nhược điểm'),
                      ),
                      TextField(
                        controller: dieukienController,
-                       decoration: InputDecoration(labelText: 'Điều kiện sinh trưởng'),
+                       decoration: const InputDecoration(labelText: 'Điều kiện sinh trưởng'),
                      ),
                    ],
                  ),
@@ -331,10 +359,15 @@ class _VegetableListState extends State<VegetableList> {
                    onPressed: () {
                      Navigator.of(context).pop();
                    },
-                   child: Text('Hủy'),
+                   child: const Text('Hủy'),
                  ),
                  ElevatedButton(
-                   onPressed: () async {
+                   onPressed: isLoading
+                       ? null
+                       :() async {
+                     setState(() {
+                       isLoading = true;
+                     });
                      if (_imageFile != null) {
                        // Lưu hình ảnh mới lên Firebase Storage và lấy URL
                        UploadTask uploadTask = Storageref.child("/${nameController.text}.jpg").putFile(_imageFile!);
@@ -349,6 +382,7 @@ class _VegetableListState extends State<VegetableList> {
 
                      // Cập nhật các trường thông tin khác vào Firestore
                      await FirebaseFirestore.instance.collection('vegetable').doc(data.id).update({
+                       'vid': data['vid'],
                        'tenvegetable': nameController.text,
                        'xuatxu': xuatxuController.text,
                        'sinhtruong': sinhtruongController.text,
@@ -356,11 +390,14 @@ class _VegetableListState extends State<VegetableList> {
                        'nhuocdiem': nhuocdiemController.text,
                        'dieukien': dieukienController.text,
                      });
-
+                     setState(() {
+                       isLoading = false;
+                     });
+                     ThongBao().toastMessage('Đã cập nhật cây trồng!');
                      // Đóng dialog sau khi cập nhật xong
                      Navigator.of(context).pop();
                    },
-                   child: Text('Lưu'),
+                   child: isLoading ? const CircularProgressIndicator() : const Text('Lưu'),
                  ),
                ],
              );

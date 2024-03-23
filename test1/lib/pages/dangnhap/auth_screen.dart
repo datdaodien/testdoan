@@ -1,18 +1,18 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:test1/pages/dangnhap/constants.dart';
 import 'package:test1/pages/thongbao/loading.dart';
 import 'package:test1/pages/dangnhap/widgets/login_form.dart';
 import 'package:test1/pages/thongbao/thongbao.dart';
+import '../../api/uid.dart';
 import '../../apps/router/routername.dart';
+import '../thongbao/connetinternet.dart';
 
 class AuthScreen extends StatefulWidget {
-  AuthScreen({Key? key}) : super(key: key);
+  const AuthScreen({Key? key}) : super(key: key);
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -32,11 +32,6 @@ class _AuthScreenState extends State<AuthScreen>
   TextEditingController mkController = TextEditingController();
 
   FirebaseAuth _auth = FirebaseAuth.instance;
-
-
-
-
-
 //_auth
 //           .createUserWithEmailAndPassword(
 //             email: tkController.text.toString(),
@@ -58,31 +53,40 @@ class _AuthScreenState extends State<AuthScreen>
           .then((value) async {
 
         final uid =value.user!.uid.toString();
-
-        ThongBao().toastMessage("Bạn đâ đăng nhập thành cô vào tai khoản "+ value.user!.email.toString());
-        setState(() {
-          isLoading = false;
-        });
-        Stream<DocumentSnapshot<Map<String, dynamic>>> _getUserDataStream() {
-          return FirebaseFirestore.instance
-              .collection('users')
-              .doc(uid)
-              .snapshots();
-        }
+        CurrentUser().uid = uid;
 
         DocumentSnapshot<Map<String, dynamic>> userData = await FirebaseFirestore.instance
             .collection('users')
             .doc(uid)
             .get();
-        String userRole = userData['rool']; // Giả sử trường lưu vai trò là 'role'
+        String userRole = userData['rool'];
+
+        ThongBao().toastMessage("Bạn đâ đăng nhập thành cô vào tai khoản "+ userRole.toString());
+        setState(() {
+          isLoading = false;
+        });
+        // Stream<DocumentSnapshot<Map<String, dynamic>>> _getUserDataStream() {
+        //   return FirebaseFirestore.instance
+        //       .collection('users')
+        //       .doc(uid)
+        //       .snapshots();
+        // }
+        // //
+        // // DocumentSnapshot<Map<String, dynamic>> userData = await FirebaseFirestore.instance
+        // //     .collection('users')
+        // //     .doc(uid)
+        // //     .get();
+        // // String userRole = userData['rool']; // Giả sử trường lưu vai trò là 'role'
 
         if (userRole == 'user') {
           // Nếu là user, chuyển hướng sang trang Home với dữ liệu người dùng
-          //context.goNamed(RouterName.home);
-        } else if (userRole == 'admin') {
-          // Nếu là admin, chuyển hướng sang trang Admin với dữ liệu người dùng
-          context.goNamed(RouterName.home,  );
+          UserRole().role = userRole;
+          context.goNamed(RouterName.home2);
 
+        } else if (userRole == 'admin') {
+          UserRole().role = userRole;
+          // Nếu là admin, chuyển hướng sang trang Admin với dữ liệu người dùng
+          context.goNamed(RouterName.home);
         }
           // Xử lý trường hợp khác nếu cần
       }).onError((error, stackTrace) {
@@ -128,7 +132,7 @@ class _AuthScreenState extends State<AuthScreen>
 
   @override
   Widget build(BuildContext context) {
-
+    ConnecInternet.checkInternetConnection();
     final ThemeData customTheme = ThemeData(
       primarySwatch: Colors.blue,
       inputDecorationTheme: const InputDecorationTheme(
@@ -274,11 +278,12 @@ class _AuthScreenState extends State<AuthScreen>
                               },
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                              vertical: defpaultPadding - 0.99),
-                          width: 210,
+                              vertical: defpaultPadding - 0.88),
+                          width: 220,
                           alignment: Alignment.center,
                           child:  isLoading ? Loading() : Text(
                                   "Đăng Nhập".toUpperCase(),
+                                   maxLines: 1,
                                 ),
                         ),
                       ),
